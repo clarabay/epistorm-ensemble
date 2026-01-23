@@ -232,6 +232,7 @@ def load_coverage_data():
 def create_ensemble_forecasts(forecast_data):
     ensemble1 = create_ensemble_method1(forecast_data)
     ensemble1['model'] = 'Median Epistorm Ensemble'
+    ensemble1.to_parquet(DATA_DIR / "epistorm-ensemble_forecasts.parquet", index=False)
     categorical_ensemble = create_categorical_ensemble(forecast_data)
     return pd.concat([ensemble1, categorical_ensemble], ignore_index=True)
 
