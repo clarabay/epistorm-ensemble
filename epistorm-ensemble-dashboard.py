@@ -12,7 +12,40 @@ from pathlib import Path
 from ensemble import create_ensemble_method1, create_ensemble_method2, create_categorical_ensemble
 
 # Page config
-st.set_page_config(page_title="Epistorm Influenza Forecasts", layout="wide")
+#st.set_page_config(page_title="Epistorm Influenza Forecasts", layout="wide")
+
+# Force light mode
+st.set_page_config(
+    page_title="Epistorm Ensemble Dashboard",
+    page_icon="🦠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': None
+    }
+)
+
+# Apply custom CSS to force light theme
+st.markdown("""
+    <style>
+    /* Force light mode */
+    [data-testid="stAppViewContainer"] {
+        background-color: white;
+        color: black;
+    }
+    [data-testid="stHeader"] {
+        background-color: white;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #f0f2f6;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+
 
 # Constants
 MODELS = [
