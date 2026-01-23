@@ -125,7 +125,7 @@ def load_all_forecasts():
             combined = pd.read_parquet(local_file)
             combined['reference_date'] = pd.to_datetime(combined['reference_date'])
             combined['target_end_date'] = pd.to_datetime(combined['target_end_date'])
-            st.info(f"Loaded data (last updated: {pd.Timestamp(local_file.stat().st_mtime, unit='s').strftime('%Y-%m-%d %H:%M')})")
+            st.info(f"Loaded data (last updated: {pd.Timestamp(local_file.stat().st_mtime, unit='s').strftime('%Y-%m-%d')})")
             return combined
         except Exception as e:
             st.warning(f"Error loading cached forecasts: {e}. Fetching fresh data...")
