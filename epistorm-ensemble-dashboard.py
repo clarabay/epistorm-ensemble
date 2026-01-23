@@ -14,10 +14,15 @@ from ensemble import create_ensemble_method1, create_ensemble_method2, create_ca
 # Page config
 #st.set_page_config(page_title="Epistorm Influenza Forecasts", layout="wide")
 
+
+import plotly.io as pio
+
+# Set Plotly to always use light theme
+pio.templates.default = "plotly_white"
+
 # Force light mode
 st.set_page_config(
     page_title="Epistorm Ensemble Dashboard",
-    page_icon="🦠",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
