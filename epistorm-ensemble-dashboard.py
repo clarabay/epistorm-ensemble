@@ -208,7 +208,7 @@ def load_model_forecasts(model_name):
 @st.cache_data(ttl=3600)
 def load_wis_data():
     try:
-        df = pd.read_parquet('./data/wis_ratio_epistorm_models_2526.pq')
+        df = pd.read_parquet('./wis_ratio_epistorm_models_2526.pq')
         df['target_end_date'] = pd.to_datetime(df['target_end_date'])
         df['reference_date'] = df['target_end_date'] - pd.to_timedelta(df['horizon'] * 7, unit='D')
         df['location'] = df['location'].astype(str).str.zfill(2)
@@ -220,7 +220,7 @@ def load_wis_data():
 @st.cache_data(ttl=3600)
 def load_coverage_data():
     try:
-        df = pd.read_parquet('./data/coverage_epistorm_models_2526.pq')
+        df = pd.read_parquet('./coverage_epistorm_models_2526.pq')
         df['target_end_date'] = pd.to_datetime(df['target_end_date'])
         df['reference_date'] = df['target_end_date'] - pd.to_timedelta(df['horizon'] * 7, unit='D')
         df['location'] = df['location'].astype(str).str.zfill(2)
