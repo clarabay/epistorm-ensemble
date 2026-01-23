@@ -42,12 +42,13 @@ def fetch_observed_data():
         print(f"✗ Error fetching observed data: {e}")
         return False
 
+
 def fetch_model_forecasts(model_name):
     """Fetch forecasts for a specific model"""
     base_url = f"https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/model-output/{model_name}"
     all_forecasts = []
     
-    start_date = datetime(2025, 11, 1)  # FIXED: Changed to 2025
+    start_date = datetime(2025, 11, 1)
     end_date = pd.to_datetime(Week.fromdate(datetime.now()).enddate())
     current_date = start_date
     
@@ -61,10 +62,13 @@ def fetch_model_forecasts(model_name):
                 df = pd.read_csv(StringIO(response.text))
                 df['model'] = model_name
                 
-                # Handle location formatting for specific models
-                if model_name in ['Gatech-ensemble_prob', 'Gatech-ensemble_stat']:
-                    if df['location'].dtype in ['int64', 'int32']:
-                        df['location'] = df['location'].astype(int).astype(str).str.zfill(2)
+                # FIXED: Always convert location to string and zero-pad if numeric
+                if 'location' in df.columns:
+                    # Convert to string first
+                    df['location'] = df['location'].astype(str)
+                    # Zero-pad if it looks like a numeric location code
+                    if df['location'].str.match(r'^\d+$').any():
+                        df['location'] = df['location'].str.zfill(2)
                 
                 all_forecasts.append(df)
                 print(f"  ✓ Fetched {date_str}")
