@@ -5,3 +5,4 @@ pyarrow
 epiweeks
 plotly
 numpy
+scipy
