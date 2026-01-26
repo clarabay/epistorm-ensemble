@@ -230,16 +230,16 @@ def load_coverage_data():
         return None
 
 def create_ensemble_forecasts(forecast_data):
-    #ensemble1 = create_ensemble_method1(forecast_data)
-    #ensemble1['model'] = 'Median Epistorm Ensemble'
-    #categorical_ensemble = create_categorical_ensemble(forecast_data)
-    #categorical_ensemble['model'] = 'Median Epistorm Ensemble'
-
-    ensemble1 = pd.read_csv('./data/quantile_ensemble.csv')
-    categorical_ensemble = pd.read_csv('./data/categorical_ensemble.csv')
-
+    ensemble1 = create_ensemble_method1(forecast_data)
     ensemble1['model'] = 'Median Epistorm Ensemble'
+    categorical_ensemble = create_categorical_ensemble(forecast_data)
     categorical_ensemble['model'] = 'Median Epistorm Ensemble'
+
+   # ensemble1 = pd.read_csv('./data/quantile_ensemble.csv')
+   # categorical_ensemble = pd.read_csv('./data/categorical_ensemble.csv')
+
+    #ensemble1['model'] = 'Median Epistorm Ensemble'
+    #categorical_ensemble['model'] = 'Median Epistorm Ensemble'
 
     return pd.concat([ensemble1, categorical_ensemble], ignore_index=True)
 
@@ -966,6 +966,7 @@ if tab_selection == "Evaluation":
 # ============== MAIN CONTENT ==============
 if tab_selection == "Forecasts":
     if selected_models:
+        
         fig, location_name = plot_forecasts(observed_data, forecast_data, selected_location, selected_date, selected_models, available_dates, start_date_ts, end_date_ts)
         
         st.markdown(f"<h2 style='color: #518fb0;'>Flu Hospitalization Forecasts - {location_name}</h2>", unsafe_allow_html=True)
