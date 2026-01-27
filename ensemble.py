@@ -365,10 +365,14 @@ def create_categorical_ensemble_quantile(df):
             
             # Get observed value
             last_obs = pd.to_datetime(reference_date) - timedelta(days=7)
-            obs_subset = obs[
-                (obs.location == loc) & 
-                (obs.date == last_obs)
-            ]
+            try:
+                obs_date = last_obs.strftime('%Y-%m-%d')
+                obs_vers = pd.read_csv(f'https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/refs/heads/main/auxiliary-data/target-data-archive/target-hospital-admissions_{obs_date}.csv')
+                obs_vers['date'] = pd.to_datetime(obs_vers['date'])
+                obs_subset = obs_vers[(obs_vers.location == loc) &  (obs_vers.date == last_obs)]
+            except:
+                obs_subset = obs[(obs.location == loc) &  (obs.date == last_obs)]
+
             
             if len(obs_subset) == 0:
                 print(f"No observation for {loc} on {last_obs}")
