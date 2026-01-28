@@ -20,45 +20,38 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pandas requests pyarrow epiweeks numpy scipy
-      
-      - name: Fetch forecast data
-        run: |
-          echo "Fetching forecast data..."
-          python fetch_data.py
 
-      - name: Create ensemble forecasts
-        run: |
-          echo "Creating ensemble forecasts..."
-          python create_ensemble_forecasts.py
-      
-      
-      - name: Calculate scores
-        run: |
-          echo "Calculating WIS and coverage scores..."
-          python calculate_scores.py
-      
-     
-      - name: Commit and push if changed
+      - name: Sync with remote and generate data
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
     
-          # Fetch and reset to latest remote
+          # Get latest from remote
           git fetch origin main
           git reset --hard origin/main
     
-          # Run your data updates here would have already happened above
-          # Now add the new files
+          # NOW run the data generation
+          echo "Fetching forecast data..."
+          python fetch_data.py
+    
+          echo "Creating ensemble forecasts..."
+          python create_ensemble_forecasts.py
+    
+          echo "Calculating scores..."
+          python calculate_scores.py
+
+      - name: Commit and push if changed
+        run: |
           git add data/ *.pq
     
           if git diff --staged --quiet; then
