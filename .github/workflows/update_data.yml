@@ -1,8 +1,8 @@
 name: Update Forecast Data and Calculate Scores
 on:
-  # Run every Wednesday at midnight EST (5 AM UTC)
+  
   schedule:
-    - cron: '0 5 * * 3'
+    - cron: '0 13 * * 4'
   
   # Allow manual trigger
   workflow_dispatch:
@@ -55,5 +55,4 @@ jobs:
           file_pattern: 'data/ *.pq'
           commit_user_name: github-actions[bot]
           commit_user_email: github-actions[bot]@users.noreply.github.com
-          skip_fetch: false
-          skip_checkout: false
+          pull: '--rebase --autostash'
