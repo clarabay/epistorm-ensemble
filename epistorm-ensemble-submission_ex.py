@@ -300,7 +300,7 @@ submissiondf = pd.concat([quantile_ensemble, categorical_ensemble])
 modelname = 'Epistorm-Ensemble_Flu'
 #submissiondf.to_csv(f'./submissions_practice/{reference_date}-{modelname}.csv', index=False)
 
-outdir = os.environ.get('OUTPUT_DIR', './submission_practice')
+outdir = os.environ.get('OUTPUT_DIR', './submissions_practice')
 os.makedirs(outdir, exist_ok=True)
 submissiondf.to_csv(f'{outdir}/{reference_date}-{modelname}.csv', index=False)
 
