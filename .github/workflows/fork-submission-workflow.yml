@@ -1,0 +1,104 @@
+name: Auto sync and submit to upstream
+
+# ─────────────────────────────────────────────────────────────
+# Uses ONE classic PAT (secret: CLASSIC_PAT) for everything:
+# pushing the fork branch AND opening the cross-repo PR.
+# A classic PAT is the only token type that can span two owners
+# (your org fork + the upstream) and open a fork->upstream PR.
+#
+# This same design works for the REAL CDC repo later, because a
+# classic PAT is also the only token with write to a public repo
+# you don't own. To go live: change UPSTREAM_REPO and fork the
+# real hub; nothing else changes.
+#
+# WHERE THIS LIVES: it can live in the FORK or the SCRIPT repo —
+# here it's set up to run from the SCRIPT repo (clarabay/epistorm-ensemble),
+# so NOTHING is added to the fork at all except branches with the CSV.
+#
+# EDIT:
+#   UPSTREAM_REPO = clarabay/forecast-hub-practice  (later: cdcepi/FluSight-forecast-hub)
+#   FORK_REPO     = clara-epistorm-test/forecast-hub-practice
+#   SCRIPT_REPO   = clarabay/epistorm-ensemble
+# ─────────────────────────────────────────────────────────────
+env:
+  UPSTREAM_REPO: clarabay/forecast-hub-practice
+  FORK_REPO: clara-epistorm-test/forecast-hub-practice
+  SCRIPT_REPO: clarabay/epistorm-ensemble
+  SCRIPT_PATH: epistorm-ensemble-submission_ex.py
+  MODEL_DIR: model-output/Epistorm-Ensemble_Flu
+  DEFAULT_BRANCH: main
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout script repo
+        uses: actions/checkout@v4
+        with:
+          path: script-src
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r script-src/requirements-submission.txt
+
+      # Clone the FORK with the classic PAT. origin = fork.
+      - name: Clone fork and fetch upstream
+        env:
+          CLASSIC_PAT: ${{ secrets.CLASSIC_PAT }}
+        run: |
+          git clone "https://x-access-token:${CLASSIC_PAT}@github.com/${FORK_REPO}.git" fork
+          cd fork
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add upstream "https://x-access-token:${CLASSIC_PAT}@github.com/${UPSTREAM_REPO}.git"
+          git fetch upstream
+
+      # Branch from upstream/main so the PR diff is ONLY the CSV.
+      - name: Generate submission on a clean branch
+        id: change
+        env:
+          OUTPUT_DIR: ${{ github.workspace }}/fork/${{ env.MODEL_DIR }}
+          CLASSIC_PAT: ${{ secrets.CLASSIC_PAT }}
+        run: |
+          cd fork
+          BRANCH="auto-submission-$(date +%Y%m%d-%H%M%S)"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          git checkout -b "${BRANCH}" "upstream/${DEFAULT_BRANCH}"
+          mkdir -p "${OUTPUT_DIR}"
+          cd ../script-src
+          python "${SCRIPT_PATH}"
+          cd ../fork
+          git add "${MODEL_DIR}"/*.csv
+          if git diff --cached --quiet; then
+            echo "No new CSV — nothing to commit."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+          git commit -m "Automated submission $(date -u +%Y-%m-%d)"
+          # Push branch to the FORK (origin)
+          git push origin "${BRANCH}"
+
+      # Open the PR fork -> upstream with the SAME classic PAT.
+      - name: Open pull request
+        if: steps.change.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.CLASSIC_PAT }}
+        run: |
+          cd fork
+          FORK_OWNER="${FORK_REPO%%/*}"
+          gh pr create \
+            --repo "${UPSTREAM_REPO}" \
+            --base "${DEFAULT_BRANCH}" \
+            --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
+            --title "Epistorm-Ensemble_Flu submission $(date -u +%Y-%m-%d)" \
+            --body "Automated ensemble submission."
