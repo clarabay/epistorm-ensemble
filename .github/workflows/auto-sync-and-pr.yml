@@ -1,20 +1,11 @@
 name: Auto sync fork and open PR
 
-# ─────────────────────────────────────────────────────────────
-# Lives in the SCRIPT repo (clarabay/epistorm-ensemble).
-# Operates on the FORK remotely; fork stays clean.
-#
-# YOUR LAYOUT:
-#   UPSTREAM  = clarabay/forecast-hub-practice          (you do NOT have write — correct)
-#   FORK      = clara-epistorm-test/forecast-hub-practice (token has write here)
-#   PR: fork branch -> upstream main
-# ─────────────────────────────────────────────────────────────
 env:
   UPSTREAM_REPO: clarabay/forecast-hub-practice
   FORK_REPO: clara-epistorm-test/forecast-hub-practice
   PR_TARGET_REPO: clarabay/forecast-hub-practice
-  SCRIPT_PATH: epistorm-ensemble-submission_ex.py       # EDIT if filename differs
-  MODEL_DIR: model-output/Epistorm-Ensemble_Flu         # EDIT if path differs
+  SCRIPT_PATH: epistorm-ensemble-submission_ex.py
+  MODEL_DIR: model-output/Epistorm-Ensemble_Flu
   DEFAULT_BRANCH: main
 
 on:
@@ -26,10 +17,22 @@ jobs:
   generate-and-pr:
     runs-on: ubuntu-latest
     steps:
+      # Script repo (this repo) — holds the .py, ensemble.py, locations.csv, requirements-ci.txt
       - name: Checkout script repo
         uses: actions/checkout@v4
         with:
           path: script-src
+
+      # Fork — checked out by the action itself using the token (reliable auth).
+      # persist-credentials keeps the token wired up for later push.
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.FORK_REPO }}
+          token: ${{ secrets.SYNC_PAT }}
+          path: fork
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,21 +42,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r script-src/requirements-submission.txt
 
-      # Clone the FORK using the token. origin = fork (we can push here).
-      # upstream = the practice main (read-only for us).
-      - name: Clone fork and add upstream
-        env:
-          GH_TOKEN: ${{ secrets.SYNC_PAT }}
+      - name: Add upstream and fetch
         run: |
-          git clone "https://x-access-token:${GH_TOKEN}@github.com/${FORK_REPO}.git" fork
           cd fork
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote add upstream "https://github.com/${UPSTREAM_REPO}.git"
           git fetch upstream
 
-      # Branch FROM upstream/main so the PR diff is ONLY the CSV.
-      # Generate the CSV, commit it, push the BRANCH to the fork (origin) only.
       - name: Generate submission and push branch
         id: change
         env:
@@ -75,7 +71,7 @@ jobs:
           fi
           echo "committed=true" >> "$GITHUB_OUTPUT"
           git commit -m "Automated submission $(date -u +%Y-%m-%d)"
-          git push origin "${BRANCH}"       # pushes to the FORK only
+          git push origin "${BRANCH}"
 
       - name: Open pull request
         if: steps.change.outputs.committed == 'true'
