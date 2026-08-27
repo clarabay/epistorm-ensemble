@@ -76,6 +76,12 @@ jobs:
           mkdir -p "${OUTPUT_DIR}"
           cd ../script-src
           python "${SCRIPT_PATH}"
+          echo "===== Contents of OUTPUT_DIR ====="
+          ls -la "${OUTPUT_DIR}" || echo "OUTPUT_DIR does not exist"
+          echo "===== Any CSVs written under script-src (wrong place?) ====="
+          find "${GITHUB_WORKSPACE:-..}/script-src" -name '*.csv' -newermt '-5 minutes' 2>/dev/null || true
+          echo "===== Any submission_practice folders anywhere ====="
+          find "${GITHUB_WORKSPACE:-..}" -type d -name 'submission*practice*' 2>/dev/null || true
           cd ../fork
           # Stage ONLY csv files in the model dir; never anything else.
           # Explicitly remove any stray junk that might have appeared.
@@ -107,7 +113,6 @@ jobs:
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
             --title "Epistorm-Ensemble_Flu submission $(date -u +%Y-%m-%d)" \
             --body "Automated ensemble submission."
-
 
       - name: Merge the pull request
         if: steps.change.outputs.committed == 'true'
