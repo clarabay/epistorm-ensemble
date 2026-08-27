@@ -12,7 +12,7 @@ name: Auto sync fork and open PR
 # ─────────────────────────────────────────────────────────────
 env:
   UPSTREAM_REPO: clarabay/forecast-hub-practice          # EDIT
-  FORK_REPO: mobslab/forecast-hub-practice                       # EDIT
+  FORK_REPO: clara-epistorm-test/forecast-hub-practice                       # EDIT
   PR_TARGET_REPO: clarabay/forecast-hub-practice         # EDIT
   SCRIPT_REPO: clarabay/epistorm-ensemble              # EDIT
   SCRIPT_PATH: epistorm-ensemble-submission_ex.py         # EDIT
