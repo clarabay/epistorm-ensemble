@@ -81,16 +81,26 @@ jobs:
           git commit -m "Automated submission $(date -u +%Y-%m-%d)"
           git push "https://x-access-token:${SYNC_PAT}@github.com/${FORK_REPO}.git" "HEAD:refs/heads/${BRANCH}"
 
+      - name: Diagnose fork relationship
+        if: steps.change.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.UPSTREAM_PAT }}
+        run: |
+          echo "===== Is the fork a real fork of upstream? ====="
+          gh api "repos/${FORK_REPO}" --jq '{full_name, fork, parent: .parent.full_name, source: .source.full_name}' || true
+          echo "===== Upstream repo default branch ====="
+          gh api "repos/${PR_TARGET_REPO}" --jq '{full_name, default_branch}' || true
+
       - name: Open pull request
         if: steps.change.outputs.committed == 'true'
         env:
           GH_TOKEN: ${{ secrets.UPSTREAM_PAT }}
         run: |
-          cd fork
           FORK_OWNER="${FORK_REPO%%/*}"
-          gh pr create \
-            --repo "${PR_TARGET_REPO}" \
-            --base "${DEFAULT_BRANCH}" \
-            --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
-            --title "Epistorm-Ensemble_Flu submission $(date -u +%Y-%m-%d)" \
-            --body "Automated ensemble submission."
+          echo "Creating PR: head=${FORK_OWNER}:${{ steps.change.outputs.branch }} base=${DEFAULT_BRANCH} into ${PR_TARGET_REPO}"
+          # Use the REST API directly so the real error message is visible
+          gh api --method POST "repos/${PR_TARGET_REPO}/pulls" \
+            -f title="Epistorm-Ensemble_Flu submission $(date -u +%Y-%m-%d)" \
+            -f head="${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
+            -f base="${DEFAULT_BRANCH}" \
+            -f body="Automated ensemble submission."
