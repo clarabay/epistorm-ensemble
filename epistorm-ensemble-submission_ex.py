@@ -266,8 +266,8 @@ def create_epistorm_ensemble(models, reference_date):
 
             forecasts = pd.concat([forecasts, df])
             
-        except:
-            print(f'')
+        except Exception as e:
+            print(f'PULL FAILED for {model}: {type(e).__name__}: {e}')
             
     model_counts = forecasts.groupby('location')['model'].nunique().reset_index()
     model_counts.columns = ['location', 'num_models']
