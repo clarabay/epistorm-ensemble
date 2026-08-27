@@ -54,6 +54,7 @@ jobs:
         id: change
         env:
           OUTPUT_DIR: ${{ github.workspace }}/fork/${{ env.MODEL_DIR }}
+          SYNC_PAT: ${{ secrets.SYNC_PAT }}
         run: |
           cd fork
           BRANCH="auto-submission-$(date +%Y%m%d-%H%M%S)"
@@ -71,7 +72,7 @@ jobs:
           fi
           echo "committed=true" >> "$GITHUB_OUTPUT"
           git commit -m "Automated submission $(date -u +%Y-%m-%d)"
-          git push origin "${BRANCH}"
+          git push "https://x-access-token:${SYNC_PAT}@github.com/${FORK_REPO}.git" "HEAD:refs/heads/${BRANCH}"
 
       - name: Open pull request
         if: steps.change.outputs.committed == 'true'
