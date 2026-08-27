@@ -83,12 +83,15 @@ jobs:
           echo "===== Any submission_practice folders anywhere ====="
           find "${GITHUB_WORKSPACE:-..}" -type d -name 'submission*practice*' 2>/dev/null || true
           cd ../fork
-          # Stage ONLY csv files in the model dir; never anything else.
-          # Explicitly remove any stray junk that might have appeared.
+          echo "===== git status before staging ====="
+          git status
+          # Remove any macOS junk, then stage only the CSVs in the model dir
           find "${MODEL_DIR}" -name '.DS_Store' -delete 2>/dev/null || true
-          git add "${MODEL_DIR}"/*.csv
-          # Safety: unstage anything that isn't a .csv, if it somehow got added
-          git reset -q -- $(git diff --cached --name-only | grep -v '\.csv$' || true) 2>/dev/null || true
+          git add -- "${MODEL_DIR}"/*.csv
+          echo "===== git status after staging ====="
+          git status
+          echo "===== staged files ====="
+          git diff --cached --name-only
           if git diff --cached --quiet; then
             echo "No new CSV — nothing to commit."
             echo "committed=false" >> "$GITHUB_OUTPUT"
@@ -113,7 +116,6 @@ jobs:
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
             --title "Epistorm-Ensemble_Flu submission $(date -u +%Y-%m-%d)" \
             --body "Automated ensemble submission."
-
       - name: Merge the pull request
         if: steps.change.outputs.committed == 'true'
         env:
