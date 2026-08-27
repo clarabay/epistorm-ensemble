@@ -291,7 +291,7 @@ models = ['MIGHTE-Nsemble', 'MIGHTE-Joint', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_
     'Gatech-ensemble_stat']
 
 #reference_date = str(Week.fromdate(datetime.now()).enddate())
-reference_date = '2026-02-14'
+reference_date = '2026-02-07'
 
 quantile_ensemble, categorical_ensemble = create_epistorm_ensemble(models, reference_date)
 
