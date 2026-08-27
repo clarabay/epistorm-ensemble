@@ -3,7 +3,7 @@ name: Auto sync fork and open PR
 env:
   UPSTREAM_REPO: clarabay/forecast-hub-practice
   FORK_REPO: clara-epistorm-test/forecast-hub-practice
-  PR_TARGET_REPO: clarabay/forecast-hub-practice
+  PR_TARGET_REPO: clarabay/forecast-hub-practice   # PR into the UPSTREAM you own
   SCRIPT_PATH: epistorm-ensemble-submission_ex.py
   MODEL_DIR: model-output/Epistorm-Ensemble_Flu
   DEFAULT_BRANCH: main
@@ -43,12 +43,19 @@ jobs:
         run: pip install -r script-src/requirements-submission.txt
 
       - name: Add upstream and fetch
+        env:
+          SYNC_PAT: ${{ secrets.SYNC_PAT }}
         run: |
           cd fork
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote add upstream "https://github.com/${UPSTREAM_REPO}.git"
+          # Add upstream with a read token (works whether upstream is public or private).
+          # Disable pushing to upstream entirely so nothing can accidentally target it.
+          git remote add upstream "https://x-access-token:${SYNC_PAT}@github.com/${UPSTREAM_REPO}.git"
+          git remote set-url --push upstream DISABLED_NO_PUSH
           git fetch upstream
+          echo "----- remotes -----"
+          git remote -v
 
       - name: Generate submission and push branch
         id: change
@@ -77,7 +84,7 @@ jobs:
       - name: Open pull request
         if: steps.change.outputs.committed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.SYNC_PAT }}
+          GH_TOKEN: ${{ secrets.UPSTREAM_PAT }}
         run: |
           cd fork
           FORK_OWNER="${FORK_REPO%%/*}"
