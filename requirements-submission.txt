@@ -5,3 +5,5 @@ epiweeks
 sodapy
 matplotlib
 seaborn
+covidcast
+delphi_epidata
