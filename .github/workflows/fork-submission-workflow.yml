@@ -102,3 +102,15 @@ jobs:
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
             --title "Epistorm-Ensemble_Flu submission $(date -u +%Y-%m-%d)" \
             --body "Automated ensemble submission."
+
+
+      - name: Merge the pull request
+        if: steps.change.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.CLASSIC_PAT }}
+        run: |
+          cd fork
+          FORK_OWNER="${FORK_REPO%%/*}"
+          gh pr merge "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
+            --repo "${UPSTREAM_REPO}" \
+            --merge --admin
