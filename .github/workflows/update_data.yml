@@ -1,7 +1,5 @@
 name: Update Forecast Data and Calculate Scores
 on:
-  schedule:
-    - cron: '0 13 * * 4'
   
   # Allow manual trigger
   workflow_dispatch:
