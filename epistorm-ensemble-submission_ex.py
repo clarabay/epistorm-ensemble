@@ -32,6 +32,13 @@ def pull_flusight_predictions(model,date):
         List of potential dates in the iso format, e.g., 'yyyy-mm-dd', for the submission.
     """
     predictions = None
+
+    githubs = {'MIGHTE-Nsemble' : ['ausmeyer'] , 'MIGHTE-Joint' : ['ausmeyer' ], 'CEPH-Rtrend_fluH' : ['shreeyamhade', 
+           'paulocv'] , 'MOBS-EpyStrain_Flu' : ['nrmogh', 'mu373', 'rlewinter', 'clarabay', 'jessica-davis'] ,
+           'MOBS-GLEAM_RL_FLUH' : ['saraventurini', 'aleurbi', 'clarabay', 'sfiandrino', 'jessica-davis'] ,
+           'NU-PGF_FLUH' : ['dimitri-lopez'] , 'NEU_ISI-FluBcast' : ['sfiandrino'] , 'NEU_ISI-AdaptiveEnsemble' : \
+           ['sfiandrino'] , 'Gatech-ensemble_prob' : ['jiechenglu'] , 'Gatech-ensemble_stat' : ['candicedjorno'] }
+
     
     url = f"https://raw.githubusercontent.com/cdcepi/Flusight-forecast-hub/main/model-output/{model}/{date}-{model}"
     for ext in [".csv",".gz",".zip",".csv.zip",".csv.gz", '.parquet']:
@@ -45,7 +52,30 @@ def pull_flusight_predictions(model,date):
         except:
             pass
     if predictions is None:
-        print(f"Data for model {model} and date {date} unavailable")
+        #print(f"Data for model {model} and date {date} not yet merged")
+
+        usernames = githubs[model]
+        for username in usernames:
+            url = f"https://raw.githubusercontent.com/{username}/Flusight-forecast-hub/main/model-output/{model}/{date}-{model}"
+            for ext in [".csv",".gz",".zip",".csv.zip",".csv.gz", '.parquet']:
+                    try:
+                        if ext == '.parquet':
+                            predictions = pd.read_parquet(url+ext,engine='auto')
+                            predictions['location'] = predictions['location'].astype(str)
+                            predictions['target_end_date'] = pd.to_datetime(predictions['target_end_date'])
+                        else:
+                            predictions = pd.read_csv(url+ext,dtype={'location':str},parse_dates=['target_end_date'])
+                    except:
+                        pass
+
+            if len(predictions) > 0:
+                print(f"Data for model {model} and date {date} found on individual fork")
+                continue
+        
+        if predictions is None:
+            print(f"Data for model {model} and date {date} unavailable")
+
+
     return predictions
 
 
@@ -274,7 +304,7 @@ def create_epistorm_ensemble(models, reference_date):
 
     remove_loc = model_counts[model_counts.num_models<5].location.unique()
 
-    print(model_counts[model_counts.num_models<5].location.unique())
+    print(f'could not submit for locations: {remove_loc}')
 
     quantile_ensemble = create_ensemble_method1(forecasts)
 
@@ -286,25 +316,28 @@ def create_epistorm_ensemble(models, reference_date):
     return quantile_ensemble, categorical_ensemble
 
 
-models = ['MIGHTE-Nsemble', 'MIGHTE-Joint', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu', 'MOBS-GLEAM_RL_FLUH', 
+models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu', 'MOBS-GLEAM_RL_FLUH', 
     'NU-PGF_FLUH', 'NEU_ISI-FluBcast',  'NEU_ISI-AdaptiveEnsemble','Gatech-ensemble_prob',
     'Gatech-ensemble_stat']
 
-#reference_date = str(Week.fromdate(datetime.now()).enddate())
-reference_date = '2026-03-14'
+reference_date = str(Week.fromdate(datetime.now()).enddate())
+#reference_date = '2026-03-14'
 
 quantile_ensemble, categorical_ensemble = create_epistorm_ensemble(models, reference_date)
 
-submissiondf = pd.concat([quantile_ensemble, categorical_ensemble])
+#submissiondf = pd.concat([quantile_ensemble, categorical_ensemble])
+submissiondf = quantile_ensemble.copy()
 
 modelname = 'Epistorm-Ensemble_Flu'
-#submissiondf.to_csv(f'./submissions_practice/{reference_date}-{modelname}.csv', index=False)
+submissiondf.to_csv(f'./submissions_26-27/{reference_date}-{modelname}.csv', index=False)
 
-outdir = os.environ.get('OUTPUT_DIR', './submissions_practice')
+outdir = os.environ.get('OUTPUT_DIR', './submissions_26-27')
 os.makedirs(outdir, exist_ok=True)
 submissiondf.to_csv(f'{outdir}/{reference_date}-{modelname}.csv', index=False)
 
-## Plot Forecasts
+
+
+##### Plot Forecasts ######
 
 def set_date_axis_fmt(ax):
     # Set the locator
@@ -324,7 +357,7 @@ def plot_quantile_forecasts(reference_date, modelname):
     #locations['location'] = locations['location'].apply(lambda x: '0' + x if x!='US' and int(x)<10 else x)
     surv = surv.merge(locations)
 
-    preds = pd.read_csv(f'./submissions_practice/{reference_date}-{modelname}.csv')
+    preds = pd.read_csv(f'./submissions_26-27/{reference_date}-{modelname}.csv')
     preds = preds.merge(locations)
     preds = preds.sort_values(by='location_name')
 
@@ -394,14 +427,14 @@ def plot_quantile_forecasts(reference_date, modelname):
         
         
     plt.tight_layout()
-    plt.savefig(f'./submissions_practice/figs/{modelname}_{reference_date}_hosp_quantile.pdf')
+    plt.savefig(f'./submissions_26-27/figs/{modelname}_{reference_date}_hosp_quantile.pdf')
 
 
 
 def plot_categorical_forecasts(reference_date, modelname):
     locations = pd.read_csv('./locations.csv')
 
-    preds = pd.read_csv(f'./submissions_practice/{reference_date}-{modelname}.csv')
+    preds = pd.read_csv(f'./submissions_26-27/{reference_date}-{modelname}.csv')
     preds = preds.merge(locations)
     preds = preds.sort_values(by='location_name')
 
@@ -480,8 +513,9 @@ def plot_categorical_forecasts(reference_date, modelname):
 
         
     plt.tight_layout(rect=[0, 0, 1, 0.97]) 
-    plt.savefig(f'./submissions_practice/figs/{modelname}_{reference_date}_hosp_category.pdf')
+    plt.savefig(f'./submissions_26-27/figs/{modelname}_{reference_date}_hosp_category.pdf')
 
 
-#plot_quantile_forecasts(reference_date, modelname)
+plot_quantile_forecasts(reference_date, modelname)
+
 #plot_categorical_forecasts(reference_date, modelname)
