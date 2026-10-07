@@ -1,4 +1,4 @@
-name: Auto sync and submit to upstream
+name: Automated Flusight submission
 
 # ─────────────────────────────────────────────────────────────
 # Uses ONE classic PAT (secret: CLASSIC_PAT) for everything:
