@@ -41,20 +41,22 @@ jobs:
   submit:
     runs-on: ubuntu-latest
     steps:
+      # Script repo — checked out WITH the PAT so we can commit outputs back to it.
       - name: Checkout script repo
         uses: actions/checkout@v4
         with:
           path: script-src
-
+          token: ${{ secrets.CLASSIC_PAT }}
+          persist-credentials: true
+ 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
+ 
       - name: Install dependencies
         run: pip install -r script-src/requirements-submission.txt
-
-      # Clone the FORK with the classic PAT. origin = fork.
+ 
       - name: Clone fork and fetch upstream
         env:
           CLASSIC_PAT: ${{ secrets.CLASSIC_PAT }}
@@ -65,7 +67,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote add upstream "https://x-access-token:${CLASSIC_PAT}@github.com/${UPSTREAM_REPO}.git"
           git fetch upstream
-
+ 
       - name: Generate submission
         id: change
         env:
@@ -79,7 +81,22 @@ jobs:
           cd ../script-src
           python "${SCRIPT_PATH}"
  
-      # Always upload whatever CSV(s) were produced, so you can download/inspect.
+      # Commit the generated CSV + figure back into the SCRIPT repo's main.
+      # Runs on every run (dry or real). Only commits if something changed.
+      - name: Save outputs to script repo
+        run: |
+          cd script-src
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Stage the script's local outputs (adjust paths if your script changes them)
+          git add -A submissions_26-27/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No output changes to save to script repo."
+          else
+            git commit -m "Save ensemble outputs $(date -u +%Y-%m-%d)"
+            git push origin HEAD:${DEFAULT_BRANCH}
+          fi
+ 
       - name: Upload generated CSV (for inspection)
         uses: actions/upload-artifact@v4
         with:
@@ -116,5 +133,5 @@ jobs:
             --repo "${UPSTREAM_REPO}" \
             --base "${DEFAULT_BRANCH}" \
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
-            --title "Epistorm ensemble submission $(date -u +%-m/%-d)" 
-    
+            --title "Epistorm ensemble submission $(date -u +%-m/%-d)"
+ 
