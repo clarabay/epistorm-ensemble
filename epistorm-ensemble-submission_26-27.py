@@ -33,7 +33,7 @@ def pull_flusight_predictions(model,date):
     """
     predictions = None
 
-    githubs = {'MIGHTE-Nsemble' : ['ausmeyer'] , 'MIGHTE-Joint' : ['ausmeyer' ], 'CEPH-Rtrend_fluH' : ['shreeyamhade', 
+    githubs = {'MIGHTE-Nsemble' : ['ausmeyer'] , 'MIGHTE-Base' : ['ausmeyer' ], 'CEPH-Rtrend_fluH' : ['shreeyamhade', 
            'paulocv'] , 'MOBS-EpyStrain_Flu' : ['nrmogh', 'mu373', 'rlewinter', 'clarabay', 'jessica-davis'] ,
            'MOBS-GLEAM_RL_FLUH' : ['saraventurini', 'aleurbi', 'clarabay', 'sfiandrino', 'jessica-davis'] ,
            'NU-PGF_FLUH' : ['dimitri-lopez'] , 'NEU_ISI-FluBcast' : ['sfiandrino'] , 'NEU_ISI-AdaptiveEnsemble' : \
@@ -294,6 +294,10 @@ def create_epistorm_ensemble(models, reference_date):
             df['model'] = model
             df['output_type_id'] = df['output_type_id'].astype(str)
 
+            df['reference_date']  = pd.to_datetime(df['reference_date']).dt.strftime('%Y-%m-%d')
+            df['target_end_date'] = pd.to_datetime(df['target_end_date']).dt.strftime('%Y-%m-%d')
+
+
             forecasts = pd.concat([forecasts, df])
             
         except Exception as e:
@@ -318,7 +322,7 @@ def create_epistorm_ensemble(models, reference_date):
 
 models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu', 'MOBS-GLEAM_RL_FLUH', 
     'NU-PGF_FLUH', 'NEU_ISI-FluBcast',  'NEU_ISI-AdaptiveEnsemble','Gatech-ensemble_prob',
-    'Gatech-ensemble_stat']
+    'Gatech-ensemble_stat', 'NU-EMBERS']
 
 reference_date = str(Week.fromdate(datetime.now()).enddate())
 #reference_date = '2026-03-14'
