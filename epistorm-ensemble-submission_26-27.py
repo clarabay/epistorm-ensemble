@@ -386,7 +386,7 @@ def plot_quantile_forecasts(reference_date, modelname, model_counts):
             r+=1
 
         
-        d = surv[(surv.location==loc) & (surv.date>=pd.to_datetime('2026-01-15'))]
+        d = surv[(surv.location==loc) & (surv.date>=pd.to_datetime('2026-08-15'))]
         ax[r,c].plot(d.date,d['value'],'.-',color='k',label='Weekly incident hosp')
         
         #dfilt = d[d.date>=pd.to_datetime(date)]
@@ -421,7 +421,7 @@ def plot_quantile_forecasts(reference_date, modelname, model_counts):
         
         ax[r,c].set_title(locations[locations.location==loc].location_name.unique()[0], fontsize=12)    
             
-        ax[r,c].text(0.25, 0.1, f"models = {model_counts.loc[model_counts['location']==loc, 'num_models'].values[0]}",
+        ax[r,c].text(0.25, 0.85, f"models = {model_counts.loc[model_counts['location']==loc, 'num_models'].values[0]}",
             transform=ax[r,c].transAxes, va='top', ha='left', fontsize=11)
         
         if c==0:
