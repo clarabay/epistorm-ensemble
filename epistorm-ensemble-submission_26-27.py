@@ -408,7 +408,7 @@ def plot_quantile_forecasts(reference_date, modelname):
             ax[r,c].fill_between(predictions.target_end_date.unique(),pred_upp,pred_low, color=color, alpha=alpha,
                                 label=fr"PI {int(round(interval_range*100))} %")
 
-        pred_point = predictions.get_point()
+        pred_point = predictions[predictions['output_type_id']==.5]['value']
         if len(pred_point) > 0:
             ax[r,c].plot(predictions.target_end_date.unique(),pred_point,'-o',color=color)
 
