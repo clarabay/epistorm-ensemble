@@ -313,7 +313,7 @@ def create_epistorm_ensemble(models, reference_date):
 
     categorical_ensemble = create_categorical_ensemble_quantile(quantile_ensemble)
 
-    return quantile_ensemble, categorical_ensemble
+    return quantile_ensemble, categorical_ensemble, model_counts
 
 
 models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu', 'MOBS-GLEAM_RL_FLUH', 
@@ -323,7 +323,7 @@ models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_F
 reference_date = str(Week.fromdate(datetime.now()).enddate())
 #reference_date = '2026-03-14'
 
-quantile_ensemble, categorical_ensemble = create_epistorm_ensemble(models, reference_date)
+quantile_ensemble, categorical_ensemble, model_counts = create_epistorm_ensemble(models, reference_date)
 
 #submissiondf = pd.concat([quantile_ensemble, categorical_ensemble])
 submissiondf = quantile_ensemble.copy()
@@ -350,7 +350,7 @@ def set_date_axis_fmt(ax):
     # Specify formatter
     X.set_major_formatter(fmt)
 
-def plot_quantile_forecasts(reference_date, modelname):
+def plot_quantile_forecasts(reference_date, modelname, model_counts):
     surv = pull_surveillance_data()
 
     locations = pd.read_csv('./locations.csv')
@@ -516,6 +516,6 @@ def plot_categorical_forecasts(reference_date, modelname):
     plt.savefig(f'./submissions_26-27/figs/{modelname}_{reference_date}_hosp_category.pdf')
 
 
-plot_quantile_forecasts(reference_date, modelname)
+plot_quantile_forecasts(reference_date, modelname, model_counts)
 
 #plot_categorical_forecasts(reference_date, modelname)
