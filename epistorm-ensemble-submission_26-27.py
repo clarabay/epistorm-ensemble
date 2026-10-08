@@ -402,6 +402,7 @@ def plot_quantile_forecasts(reference_date, modelname, model_counts):
         
         t = predictions.target_end_date.unique()
         predictions['target_end_date'] = pd.to_datetime(predictions['target_end_date'])
+        predictions = predictions.sort_values(by='target_end_date')
         #intervals
         for interval in intervals:
             q_low,q_upp = interval
