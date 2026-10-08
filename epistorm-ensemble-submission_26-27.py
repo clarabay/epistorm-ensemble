@@ -20,6 +20,7 @@ from ensemble import create_ensemble_method1, create_categorical_ensemble_quanti
 from pathlib import Path
 import sys
 
+
 def pull_flusight_predictions(model,date):
     """pull_scenario_modeling_hub_predictions. Load predictions of the model saved by the scenario modeling
     hub.
@@ -40,7 +41,7 @@ def pull_flusight_predictions(model,date):
            ['sfiandrino'] , 'Gatech-ensemble_prob' : ['jiechenglu'] , 'Gatech-ensemble_stat' : ['candicedjorno'] }
 
     
-    url = f"https://raw.githubusercontent.com/cdcepi/Flusight-forecast-hub/main/model-output/{model}/{date}-{model}"
+    url = f"https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/model-output/{model}/{date}-{model}"
     for ext in [".csv",".gz",".zip",".csv.zip",".csv.gz", '.parquet']:
         try:
             if ext == '.parquet':
@@ -56,7 +57,7 @@ def pull_flusight_predictions(model,date):
 
         usernames = githubs[model]
         for username in usernames:
-            url = f"https://raw.githubusercontent.com/{username}/Flusight-forecast-hub/main/model-output/{model}/{date}-{model}"
+            url = f"https://raw.githubusercontent.com/{username}/FluSight-forecast-hub/main/model-output/{model}/{date}-{model}"
             for ext in [".csv",".gz",".zip",".csv.zip",".csv.gz", '.parquet']:
                     try:
                         if ext == '.parquet':
