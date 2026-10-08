@@ -396,7 +396,7 @@ def plot_quantile_forecasts(reference_date, modelname):
         
         predictions['output_type_id'] = predictions['output_type_id'].astype(float)
         
-        t = np.unique(predictions.get_t())
+        t = predictions.target_end_date.unique()
         predictions['target_end_date'] = pd.to_datetime(predictions['target_end_date'])
         #intervals
         for interval in intervals:
