@@ -403,8 +403,8 @@ def plot_quantile_forecasts(reference_date, modelname):
             q_low,q_upp = interval
             interval_range = q_upp - q_low
             alpha = map_alpha(interval_range)
-            pred_low = predictions.get_quantile(q_low, )
-            pred_upp = predictions.get_quantile(q_upp, )
+            pred_low = predictions[predictions['quantile']==q_low]
+            pred_upp = predictions[predictions['quantile']==q_upp]
             ax[r,c].fill_between(predictions.target_end_date.unique(),pred_upp,pred_low, color=color, alpha=alpha,
                                 label=fr"PI {int(round(interval_range*100))} %")
 
