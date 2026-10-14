@@ -37,8 +37,10 @@ def pull_flusight_predictions(model,date):
     githubs = {'MIGHTE-Nsemble' : ['ausmeyer'] , 'MIGHTE-Base' : ['ausmeyer' ], 'CEPH-Rtrend_fluH' : ['shreeyamhade', 
            'paulocv'] , 'MOBS-EpyStrain_Flu' : ['nrmogh', 'mu373', 'rlewinter', 'clarabay', 'jessica-davis'] ,
            'MOBS-GLEAM_RL_FLUH' : ['saraventurini', 'aleurbi', 'clarabay', 'sfiandrino', 'jessica-davis'] ,
-           'NU-PGF_FLUH' : ['dimitri-lopez'] , 'NEU_ISI-FluBcast' : ['sfiandrino'] , 'NEU_ISI-AdaptiveEnsemble' : \
-           ['sfiandrino'] , 'Gatech-ensemble_prob' : ['jiechenglu'] , 'Gatech-ensemble_stat' : ['candicedjorno'] }
+           'NU-EMBERS' : ['dimitri-lopez'] , 'NEU_ISI-FluBcast' : ['sfiandrino'] , 'NEU_ISI-AdaptiveEnsemble' : \
+           ['sfiandrino'] , 'Gatech-ensemble_prob' : ['jiechenglu'] , 'Gatech-ensemble_stat' : ['candicedjorno'],
+              'Xi_lab-GLEAM_AI':['mattk7'], 'Xi_lab-GLEAM_AI_hybrid':['mattk7'], 'NU-FLARE':['aperofsky'],  
+              'MOBS-GLEAM_NCB_FLUH': ['saraventurini', 'aleurbi', 'clarabay', 'sfiandrino', 'jessica-davis']}
 
     
     url = f"https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/model-output/{model}/{date}-{model}"
@@ -322,8 +324,9 @@ def create_epistorm_ensemble(models, reference_date):
 
 
 models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu', 'MOBS-GLEAM_RL_FLUH', 
-    'NU-PGF_FLUH', 'NEU_ISI-FluBcast',  'NEU_ISI-AdaptiveEnsemble','Gatech-ensemble_prob',
-    'Gatech-ensemble_stat', 'NU-EMBERS']
+         'NEU_ISI-FluBcast',  'NEU_ISI-AdaptiveEnsemble','Gatech-ensemble_prob',
+         'Gatech-ensemble_stat', 'NU-EMBERS', 'MOBS-GLEAM_NCB_FLUH', 'Xi_lab-GLEAM_AI', 'Xi_lab-GLEAM_AI_hybrid', 
+         'NU-FLARE', ]
 
 reference_date = str(Week.fromdate(datetime.now()).enddate())
 #reference_date = '2026-03-14'
