@@ -29,6 +29,8 @@ env:
   DEFAULT_BRANCH: main
 
 on:
+  schedule:
+    - cron: '36 22 * * 3'  
   workflow_dispatch:
     inputs:
       dry_run:
