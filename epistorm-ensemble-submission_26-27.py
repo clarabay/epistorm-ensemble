@@ -60,6 +60,10 @@ def pull_flusight_predictions(model,date):
         usernames = githubs[model]
         for username in usernames:
             url = f"https://raw.githubusercontent.com/{username}/FluSight-forecast-hub/main/model-output/{model}/{date}-{model}"
+            
+            if username=='dimitri-lopez':
+                url = f"https://raw.githubusercontent.com/{username}/FluSight-forecast-hub/refs/heads/submission/{date}/model-output/{model}/{date}-{model}"
+            
             for ext in [".csv",".gz",".zip",".csv.zip",".csv.gz", '.parquet']:
                     try:
                         if ext == '.parquet':
