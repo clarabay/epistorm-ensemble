@@ -136,4 +136,5 @@ jobs:
             --base "${DEFAULT_BRANCH}" \
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
             --title "Epistorm ensemble submission $(date -u +%-m/%-d)"
+            --body ""
  
