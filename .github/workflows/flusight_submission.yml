@@ -30,7 +30,7 @@ env:
 
 on:
   schedule:
-    - cron: '36 22 * * 3'  
+    - cron: cron: '36 2 * * 4'  
   workflow_dispatch:
     inputs:
       dry_run:
@@ -135,6 +135,6 @@ jobs:
             --repo "${UPSTREAM_REPO}" \
             --base "${DEFAULT_BRANCH}" \
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
-            --title "Epistorm ensemble submission $(date -u +%-m/%-d)"
+            --title "Epistorm ensemble submission $(date -u +%-m/%-d)" \
             --body ""
  
