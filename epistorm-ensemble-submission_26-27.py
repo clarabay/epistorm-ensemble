@@ -339,6 +339,7 @@ quantile_ensemble, categorical_ensemble, model_counts = create_epistorm_ensemble
 
 #submissiondf = pd.concat([quantile_ensemble, categorical_ensemble])
 submissiondf = quantile_ensemble.copy()
+submissiondf['horizon'] = submissiondf['horizon'].astype(int)
 
 modelname = 'Epistorm-Ensemble_Flu'
 submissiondf.to_csv(f'./submissions_26-27/{reference_date}-{modelname}.csv', index=False)
