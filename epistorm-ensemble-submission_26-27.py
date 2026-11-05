@@ -38,7 +38,7 @@ def pull_flusight_predictions(model,date):
            'paulocv'] , 'MOBS-EpyStrain_Flu' : ['nrmogh', 'mu373', 'rlewinter', 'clarabay', 'jessica-davis'] ,
            'MOBS-GLEAM_RL_FLUH' : ['saraventurini', 'aleurbi', 'clarabay', 'sfiandrino', 'jessica-davis'] ,
            'NU-EMBERS' : ['dimitri-lopez'] , 'NEU_ISI-FluBcast' : ['sfiandrino'] , 'NEU_ISI-AdaptiveEnsemble' : \
-           ['sfiandrino'] , 'Gatech-ensemble_prob' : ['jiechenglu'] , 'Gatech-ensemble_stat' : ['candicedjorno'],
+           ['sfiandrino'] , 'Gatech-ensemble_prob' : ['jiechenglu', 'LJC-FVNR'] , 'Gatech-ensemble_stat' : ['candicedjorno'],
               'Xi_lab-GLEAM_AI':['mattk7'], 'Xi_lab-GLEAM_AI_hybrid':['mattk7'], 'NU-FLARE':['aperofsky'],  
               'MOBS-GLEAM_NCB_FLUH': ['saraventurini', 'aleurbi', 'clarabay', 'sfiandrino', 'jessica-davis']}
 
@@ -327,7 +327,7 @@ def create_epistorm_ensemble(models, reference_date):
     return quantile_ensemble, categorical_ensemble, model_counts
 
 
-models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu', 'MOBS-GLEAM_RL_FLUH', 
+models = ['MIGHTE-Nsemble', 'MIGHTE-Base', 'CEPH-Rtrend_fluH', 'MOBS-EpyStrain_Flu',  
          'NEU_ISI-FluBcast',  'NEU_ISI-AdaptiveEnsemble','Gatech-ensemble_prob',
          'Gatech-ensemble_stat', 'NU-EMBERS', 'MOBS-GLEAM_NCB_FLUH', 'Xi_lab-GLEAM_AI', 'Xi_lab-GLEAM_AI_hybrid', 
          'NU-FLARE', ]
