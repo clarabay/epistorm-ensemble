@@ -133,6 +133,6 @@ jobs:
             --repo "${UPSTREAM_REPO}" \
             --base "${DEFAULT_BRANCH}" \
             --head "${FORK_OWNER}:${{ steps.change.outputs.branch }}" \
-            --title "Epistorm ensemble submission $(date -u +%-m/%-d)" \
+            --title "Epistorm ensemble submission $(TZ=America/New_York date +%-m/%-d)" \
             --body ""
  
