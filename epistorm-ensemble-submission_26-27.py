@@ -63,6 +63,8 @@ def pull_flusight_predictions(model,date):
             
             if username=='dimitri-lopez':
                 url = f"https://raw.githubusercontent.com/{username}/FluSight-forecast-hub/refs/heads/submission/{date}/model-output/{model}/{date}-{model}"
+            elif username=='aperofsky':
+                url = f"https://raw.githubusercontent.com/{username}/FluSight-forecast-hub/refs/heads/nu-flare-{date}/model-output/{model}/{date}-{model}"
             
             for ext in [".csv",".gz",".zip",".csv.zip",".csv.gz", '.parquet']:
                     try:
